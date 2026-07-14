@@ -97,7 +97,6 @@ Synthesizes cleanly to standard-cell libraries; round keys and S-box tables domi
 2. **Pipelined throughput** — unrolled 10-stage pipeline + precomputed keys = one block per 10 cycles, no scheduling stalls.
 3. **Smart buffering** — asymmetric dual-FIFO design balances area/latency/flexibility; global stall keeps flow control simple.
 4. **Standard interfaces** — AXI4-Lite master + slave ports drop into any standard SoC flow.
-5. **Deliberate trade-offs** — every design choice documents a defensible area/performance/complexity call for the target use case (edge encryption, embedded systems).
 
 ---
 *For register-level traces and implementation detail, see the module source files and testbench.*
