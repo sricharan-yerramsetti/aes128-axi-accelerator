@@ -25,7 +25,28 @@ A complete AES-128 encryption accelerator with AXI4-Lite interfaces, operating a
 | `KEY[0..3]` | `3'h4`–`3'h7` | RW | 128-bit key, little-endian words (`KEY[0]`=LSB…`KEY[3]`=MSB). Latched on START; safe to rewrite while `BUSY` (has no effect on the in-flight run). |
 
 **Usage flow:** set `START_ADDR`/`END_ADDR` → load `KEY[0..3]` → write START in `CTRL` → poll `STATUS` until `DONE`/`ERROR` → read ciphertext back from the same addresses in external memory.
+---
+## State Machines
 
+### Top-level controller
+![Top-level controller ASMD chart](asmd_charts/AR_channel.png)
+
+### Read controller — AR FSM
+![AR state machine ASMD chart](asmd_charts/R_channel.png)
+
+### Read controller — R FSM
+![R state machine ASMD chart](asmd_charts/AW_channel.png)
+
+### Write controller
+![Write controller ASMD chart](asmd_charts/W_channel_1.png)
+
+### read_mem FIFO flow control
+![read_mem FIFO ASMD chart](asmd_charts/W_channel_2.png)
+
+### write_mem FIFO flow control
+![write_mem FIFO ASMD chart](asmd_charts/B_channel.png)
+
+---
 ## Memory Subsystem: Dual-FIFO Design
 
 Two independent 4-entry circular FIFOs (dual-pointer, 3-bit pointers for wrap detection) decouple memory latency from encryption throughput. Empty = `read_ptr == write_ptr`; full = low 2 bits match but MSBs differ (wrap-around).
