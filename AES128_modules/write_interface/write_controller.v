@@ -1,24 +1,24 @@
 module write_controller(
-    input  wire        clk,
-    input  wire        areset,
-    input  wire        start,
-    input  wire        empty,
+    input  wire clk,
+    input  wire areset,
+    input  wire start,
+    input  wire empty,
     input  wire [31:0] end_address,
-    input  wire        AWREADY,
-    input  wire        WREADY,
-    input  wire        BVALID,
+    input  wire AWREADY,
+    input  wire WREADY,
+    input  wire BVALID,
     input  wire [1:0]  BRESP,
     input  wire [31:0] rd_data,
     input  wire [31:0] addr,
     output wire [31:0] AWADDR,
     output wire [31:0] WDATA,
-    output reg         AWVALID,
-    output reg         WVALID,
-    output wire        BREADY,
-    output reg         rd_en,
-    output reg         stall,
-    output reg         done,
-    output wire        error
+    output reg AWVALID,
+    output reg WVALID,
+    output wire BREADY,
+    output reg rd_en,
+    output reg stall,
+    output reg done,
+    output wire error
 );
 
 localparam aw_idle = 1'b0;
@@ -54,8 +54,8 @@ always@(*) begin
                         w_done = (WVALID) ? (WVALID && WREADY) : 1;
                         if(aw_done && w_done) begin
                             stall = 0;
-                            rd_en = (AWADDR < end_address) ? ((empty) ? 0 : 1) : 0 ;
-                            next_state_1 = ((AWADDR < end_address) && (!empty)) ? aw_run : aw_idle;
+                            rd_en = ((AWADDR + 4) < end_address) ? ((empty) ? 0 : 1) : 0 ;
+                            next_state_1 = (((AWADDR + 4) < end_address) && (!empty)) ? aw_run : aw_idle;
                         end
                         else begin
                             stall = 1;
@@ -85,9 +85,9 @@ always@(posedge clk or negedge areset) begin
                       end
             aw_run : begin
                         if(aw_done && w_done) begin
-                            AWVALID <= ((AWADDR < end_address) && (!empty)) ? 1 : 0;
-                            WVALID <= ((AWADDR < end_address) && (!empty)) ? 1 : 0;
-                            done <= (AWADDR < end_address) ? done : 1;
+                            AWVALID <= (((AWADDR + 4) < end_address) && (!empty)) ? 1 : 0;
+                            WVALID <= (((AWADDR + 4) < end_address) && (!empty)) ? 1 : 0;
+                            done <= ((AWADDR + 4) < end_address) ? done : 1;
                         end
                         else begin
                             AWVALID <= (AWVALID && (!AWREADY));
