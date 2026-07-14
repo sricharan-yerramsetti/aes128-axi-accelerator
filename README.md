@@ -90,9 +90,6 @@ Two independent 4-entry circular FIFOs (dual-pointer, 3-bit pointers for wrap de
 
 Synthesizes cleanly to standard-cell libraries; round keys and S-box tables dominate area, pipeline stage logic depth dominates critical path timing.
 
-## Future Work
-
-AES-192/256 support · GCM/CTR modes · decryption path (`InvShiftRows`/`InvSubBytes`/`InvMixColumns`) · scatter/gather addressing · AXI4 burst support · completion interrupts (vs. polling) · key revocation/reset · TRNG-based IV generation for CBC/CTR.
 
 ## Key Takeaways
 
