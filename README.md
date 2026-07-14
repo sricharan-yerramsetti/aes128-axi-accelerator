@@ -106,10 +106,9 @@ vvp aes_sim
 |---|---|
 | Precomputed round keys | +area (11×128-bit) for zero key-scheduling latency; on-the-fly generation suits tighter-area designs. |
 | 10-stage unrolled pipeline | High area (10× round logic) for max throughput vs. an iterative single-stage design (~1/10 area, ~1/10 throughput). |
-| Asymmetric dual FIFOs | Fine-grained AXI control at the cost of more complex FIFO logic vs. a simpler symmetric design. |
+|dual FIFOs | Fine-grained AXI control at the cost of more complex FIFO logic vs. a simpler symmetric design. |
 | Global stall signal | Simple, one signal, coarse-grained — sufficient for correctness vs. per-module back-pressure. |
-| Sequential addressing | Simple contiguous read/write vs. flexible scatter/gather. |
-| Synchronous control | Deterministic, verification-friendly vs. lower-latency async signaling. |
+
 
 ## Verification
 
