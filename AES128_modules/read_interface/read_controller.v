@@ -31,6 +31,15 @@ localparam r_run = 1'b1;
 localparam OKAY = 2'b00;
 reg[31:0] req_addr,resp_addr;
 
+reg start_d;
+wire start_pulse = start & ~start_d;
+
+always@(posedge clk or negedge areset) begin
+    if(areset == 0)
+        start_d <= 1'b0;
+    else
+        start_d <= start;
+end
 
 assign ARADDR = req_addr;
 assign ARVALID = (state_1 == ar_run);
@@ -43,7 +52,7 @@ always@(*) begin
     if(start) begin
     case(state_1) 
         ar_idle : begin
-                    next_state_1 = ((start == 1)&&(!full))? ar_run:ar_idle;
+                    next_state_1 = ((start_pulse == 1)&&(!full))? ar_run:ar_idle;
                   end
         ar_run : begin
                     if((ARREADY)&&(!stall)&&(!full)) begin
@@ -70,7 +79,7 @@ always@(*) begin
     case(state_2)
         r_idle : begin
                     RREADY = 0;
-                    next_state_2 = (start == 1)? r_run : r_idle;
+                    next_state_2 = (start_pulse == 1)? r_run : r_idle;
                  end
         r_run : begin
                     RREADY = (!(stall || full));
