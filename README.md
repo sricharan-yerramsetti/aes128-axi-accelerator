@@ -29,22 +29,22 @@ A complete AES-128 encryption accelerator with AXI4-Lite interfaces, operating a
 ## State Machines
 
 ### Read Controller - AR_channel
-<img src="asmd_charts/ar_channel.png" height="600" >
+<img src="asmd_charts/ar_channel.png" height="700" >
 
 ### Read controller — R_channel
-<img src="asmd_charts/r_channel.png" height="600">
+<img src="asmd_charts/r_channel.png" height="700">
 
 ### Write controller — AW channel
-<img src="asmd_charts/aw_channel.png" height="600">
+<img src="asmd_charts/aw_channel.png" height="700">
 
 ### Write controller - W_channel - 1
-<img src="asmd_charts/w_channel_1.png" height="600">
+<img src="asmd_charts/w_channel_1.png" height="700">
 
 ### Write controller - W_channel - 2
-<img src="asmd_charts/w_channel_2.png" height="600">
+<img src="asmd_charts/w_channel_2.png" height="700">
 
 ### Write controller - B_channel - 3
-<img src="asmd_charts/b_channel.png" height="600">
+<img src="asmd_charts/b_channel.png" height="700">
 
 
 ---
