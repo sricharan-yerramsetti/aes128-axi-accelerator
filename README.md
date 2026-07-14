@@ -30,21 +30,27 @@ A complete AES-128 encryption accelerator with AXI4-Lite interfaces, operating a
 
 ### Top-level controller
 ![Top-level controller ASMD chart](asmd_charts/AR_channel.png)
+<img src="asmd_charts/AR_channel.png" alt="Grayscale Source"
 
 ### Read controller — AR FSM
-![AR state machine ASMD chart](asmd_charts/R_channel.png)
+<img src="asmd_charts/R_channel.png" alt="Grayscale Source"
+
 
 ### Read controller — R FSM
-![R state machine ASMD chart](asmd_charts/AW_channel.png)
+<img src="asmd_charts/AW_channel.png" alt="Grayscale Source"
+
 
 ### Write controller
-![Write controller ASMD chart](asmd_charts/W_channel_1.png)
+<img src="asmd_charts/W_channel_1.png" alt="Grayscale Source"
+
 
 ### read_mem FIFO flow control
-![read_mem FIFO ASMD chart](asmd_charts/W_channel_2.png)
+<img src="asmd_charts/W_channel_2.png" alt="Grayscale Source"
+
 
 ### write_mem FIFO flow control
-![write_mem FIFO ASMD chart](asmd_charts/B_channel.png)
+<img src="asmd_charts/B_channel.png" alt="Grayscale Source"
+
 
 ---
 ## Memory Subsystem: Dual-FIFO Design
