@@ -30,7 +30,7 @@ A complete AES-128 encryption accelerator with AXI4-Lite interfaces, operating a
 
 ### Top-level controller
 ![Top-level controller ASMD chart](asmd_charts/AR_channel.png)
-<img src="asmd_charts/AR_channel.png">
+<img src="asmd_charts/AR_channel.png" alt = "Greyscale source">
 
 ### Read controller — AR FSM
 <img src="asmd_charts/R_channel.png">
