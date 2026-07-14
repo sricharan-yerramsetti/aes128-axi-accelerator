@@ -99,4 +99,30 @@ Synthesizes cleanly to standard-cell libraries; round keys and S-box tables domi
 4. **Standard interfaces** — AXI4-Lite master + slave ports drop into any standard SoC flow.
 
 ---
+%%{init: {'themeVariables': {'primaryTextColor':'#000000','edgeLabelBackground':'#ffffff','lineColor':'#333333'}}}%%
+flowchart TD
+    S0["AR.idle<br/>AR.valid = 0"]
+    D0{"start"}
+    S1["AR.RUN<br/>AR.VALID = 1"]
+    D1{"ARREADY &&<br/>!stall &&<br/>!full"}
+    D2{"end?<br/>req_addr < end_addr"}
+
+    S0 --> D0
+    D0 -- No --> S0
+    D0 -- Yes --> O1(["req_addr <= start_addr"])
+    O1 --> S1
+    S1 --> D1
+    D1 -- No --> S1
+    D1 -- Yes --> D2
+    D2 -- No --> O2(["req_addr <= req_addr"])
+    O2 --> S1
+    D2 -- Yes --> O3(["req_addr <= req_addr + 4"])
+    O3 --> S1
+
+    classDef state fill:#dbe7ff,stroke:#1d4ed8,stroke-width:3px,color:#000000;
+    classDef dec fill:#fff3cd,stroke:#b45309,stroke-width:2px,color:#000000;
+    classDef out fill:#e2f7e1,stroke:#15803d,stroke-width:2px,color:#000000;
+    class S0,S1 state;
+    class D0,D1,D2 dec;
+    class O1,O2,O3 out;
 *For register-level traces and implementation detail, see the module source files and testbench.*
