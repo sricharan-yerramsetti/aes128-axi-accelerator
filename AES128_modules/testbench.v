@@ -1,125 +1,71 @@
 `timescale 1ns/1ps
-// ═══════════════════════════════════════════════════════════════════════
-// tb_aes_top
-//
-// Instantiates aes_ip (core) and memory_top (data RAM) as two separate
-// top-level blocks, wired together exactly the way the real system would
-// connect them (aes_ip's two AXI4-Lite master ports both talk to the
-// single AXI4-Lite slave port on memory_top).
-//
-// The testbench itself acts as the THIRD AXI4-Lite master:
-//   1. Writes plaintext test vectors into memory_top  (CPU-style memory init)
-//   2. Writes KEY / START_ADDR / END_ADDR / CTRL into aes_ip's register file
-//   3. Lets aes_ip run autonomously (it becomes bus master for read+write)
-//   4. Polls STATUS until DONE
-//   5. Reads ciphertext back out of memory_top and compares vs. expected
-//
-// Single AES-128 key, 6 plaintext blocks, all known-good vectors verified
-// independently against PyCryptodome AES-128-ECB.
-// ═══════════════════════════════════════════════════════════════════════
 module tb_aes_top;
 
-// ───────────────────────────────────────────────────────────────────────
-// Clock / reset
-// ───────────────────────────────────────────────────────────────────────
+
 reg clk;
-reg areset;   // ACTIVE-LOW reset (matches RTL: if(!areset) / if(areset==0))
+reg areset;
 
 initial clk = 0;
-always #5 clk = ~clk;  // 100 MHz
 
-// ───────────────────────────────────────────────────────────────────────
-// aes_ip <-> testbench (S_CTRL register port, AXI4-Lite slave on aes_ip)
-// ───────────────────────────────────────────────────────────────────────
 reg  [31:0] S_CTRL_ARADDR;
-reg         S_CTRL_ARVALID;
-wire        S_CTRL_ARREADY;
+reg S_CTRL_ARVALID;
+wire S_CTRL_ARREADY;
 wire [31:0] S_CTRL_RDATA;
-wire        S_CTRL_RVALID;
-reg         S_CTRL_RREADY;
+wire S_CTRL_RVALID;
+reg S_CTRL_RREADY;
 wire [ 1:0] S_CTRL_RRESP;
-
 reg  [31:0] S_CTRL_AWADDR;
-reg         S_CTRL_AWVALID;
-wire        S_CTRL_AWREADY;
+reg S_CTRL_AWVALID;
+wire S_CTRL_AWREADY;
 reg  [31:0] S_CTRL_WDATA;
-reg         S_CTRL_WVALID;
-wire        S_CTRL_WREADY;
-wire        S_CTRL_BVALID;
-reg         S_CTRL_BREADY;
+reg S_CTRL_WVALID;
+wire S_CTRL_WREADY;
+wire S_CTRL_BVALID;
+reg S_CTRL_BREADY;
 wire [ 1:0] S_CTRL_BRESP;
-
-// ───────────────────────────────────────────────────────────────────────
-// aes_ip <-> memory_top (read master port)
-// ───────────────────────────────────────────────────────────────────────
 wire [31:0] M_RD_ARADDR;
-wire        M_RD_ARVALID;
-wire        M_RD_ARREADY;
+wire M_RD_ARVALID;
+wire M_RD_ARREADY;
 wire [31:0] M_RD_RDATA;
-wire        M_RD_RVALID;
+wire M_RD_RVALID;
 wire [ 1:0] M_RD_RRESP;
-wire        M_RD_RREADY;
-
-// ───────────────────────────────────────────────────────────────────────
-// aes_ip <-> memory_top (write master port)
-// ───────────────────────────────────────────────────────────────────────
+wire M_RD_RREADY;
 wire [31:0] M_WR_AWADDR;
-wire        M_WR_AWVALID;
-wire        M_WR_AWREADY;
+wire M_WR_AWVALID;
+wire M_WR_AWREADY;
 wire [31:0] M_WR_WDATA;
-wire        M_WR_WVALID;
-wire        M_WR_WREADY;
-wire        M_WR_BVALID;
+wire M_WR_WVALID;
+wire M_WR_WREADY;
+wire M_WR_BVALID;
 wire [ 1:0] M_WR_BRESP;
-wire        M_WR_BREADY;
-
-// ───────────────────────────────────────────────────────────────────────
-// testbench <-> memory_top  (direct memory-init / readback master port)
-//
-// memory_top exposes ONE AXI4-Lite slave port. aes_ip's two master ports
-// (M_RD_*, M_WR_*) are wired straight to it. The testbench needs its own
-// access to pre-load plaintext and read back ciphertext -- but memory_top
-// only has one slave port, and it's already wired to aes_ip.
-//
-// Solution: a tiny passive AXI mux. While aes_ip is idle (not_avai-equiv.
-// we just gate on "tb_mem_active"), the testbench drives memory_top's
-// slave port directly. Once aes_ip starts running, the testbench
-// releases the bus and aes_ip's M_RD_*/M_WR_* drive memory_top instead.
-// This models "single shared memory, one bus master active at a time",
-// which is exactly how the real system would behave with a real bus
-// arbiter / CPU that backs off once it kicks the IP off.
-// ───────────────────────────────────────────────────────────────────────
-reg         tb_mem_active;   // 1 = testbench drives memory_top, 0 = aes_ip drives it
+wire M_WR_BREADY;
+reg tb_mem_active;   // 1 = testbench drives memory_top, 0 = aes_ip drives it
 
 reg  [31:0] tb_ARADDR;
-reg         tb_ARVALID;
+reg tb_ARVALID;
 reg  [31:0] tb_AWADDR;
-reg         tb_AWVALID;
+reg tb_AWVALID;
 reg  [31:0] tb_WDATA;
-reg         tb_WVALID;
-reg         tb_RREADY;
-reg         tb_BREADY;
-
+reg tb_WVALID;
+reg tb_RREADY;
+reg tb_BREADY;
 wire [31:0] MEM_ARADDR  = tb_mem_active ? tb_ARADDR  : M_RD_ARADDR;
-wire        MEM_ARVALID = tb_mem_active ? tb_ARVALID : M_RD_ARVALID;
-wire        MEM_RREADY  = tb_mem_active ? tb_RREADY  : M_RD_RREADY;
-
+wire MEM_ARVALID = tb_mem_active ? tb_ARVALID : M_RD_ARVALID;
+wire MEM_RREADY  = tb_mem_active ? tb_RREADY  : M_RD_RREADY;
 wire [31:0] MEM_AWADDR  = tb_mem_active ? tb_AWADDR  : M_WR_AWADDR;
-wire        MEM_AWVALID = tb_mem_active ? tb_AWVALID : M_WR_AWVALID;
+wire MEM_AWVALID = tb_mem_active ? tb_AWVALID : M_WR_AWVALID;
 wire [31:0] MEM_WDATA   = tb_mem_active ? tb_WDATA   : M_WR_WDATA;
-wire        MEM_WVALID  = tb_mem_active ? tb_WVALID  : M_WR_WVALID;
-wire        MEM_BREADY  = tb_mem_active ? tb_BREADY  : M_WR_BREADY;
-
-wire        MEM_ARREADY;
+wire MEM_WVALID  = tb_mem_active ? tb_WVALID  : M_WR_WVALID;
+wire MEM_BREADY  = tb_mem_active ? tb_BREADY  : M_WR_BREADY;
+wire MEM_ARREADY;
 wire [31:0] MEM_RDATA;
-wire        MEM_RVALID;
+wire MEM_RVALID;
 wire [ 1:0] MEM_RRESP;
-wire        MEM_AWREADY;
-wire        MEM_WREADY;
-wire        MEM_BVALID;
+wire MEM_AWREADY;
+wire MEM_WREADY;
+wire MEM_BVALID;
 wire [ 1:0] MEM_BRESP;
-
-// Route memory_top's responses back to whichever master is active
+    
 assign M_RD_ARREADY = tb_mem_active ? 1'b0 : MEM_ARREADY;
 assign M_RD_RDATA    = MEM_RDATA;
 assign M_RD_RVALID   = tb_mem_active ? 1'b0 : MEM_RVALID;
@@ -130,19 +76,16 @@ assign M_WR_WREADY  = tb_mem_active ? 1'b0 : MEM_WREADY;
 assign M_WR_BVALID  = tb_mem_active ? 1'b0 : MEM_BVALID;
 assign M_WR_BRESP   = MEM_BRESP;
 
-wire        tb_ARREADY = MEM_ARREADY;
+wire tb_ARREADY = MEM_ARREADY;
 wire [31:0] tb_RDATA   = MEM_RDATA;
-wire        tb_RVALID  = tb_mem_active ? MEM_RVALID : 1'b0;
+wire tb_RVALID  = tb_mem_active ? MEM_RVALID : 1'b0;
 wire [ 1:0] tb_RRESP   = MEM_RRESP;
 
-wire        tb_AWREADY = MEM_AWREADY;
-wire        tb_WREADY  = MEM_WREADY;
-wire        tb_BVALID  = tb_mem_active ? MEM_BVALID : 1'b0;
+wire tb_AWREADY = MEM_AWREADY;
+wire tb_WREADY  = MEM_WREADY;
+wire tb_BVALID  = tb_mem_active ? MEM_BVALID : 1'b0;
 wire [ 1:0] tb_BRESP   = MEM_BRESP;
 
-// ───────────────────────────────────────────────────────────────────────
-// DUT 1: aes_ip core
-// ───────────────────────────────────────────────────────────────────────
 aes_ip u_aes_ip (
     .clk            (clk),
     .areset         (areset),
@@ -184,9 +127,7 @@ aes_ip u_aes_ip (
     .M_WR_BREADY    (M_WR_BREADY)
 );
 
-// ───────────────────────────────────────────────────────────────────────
-// DUT 2: memory_top (shared data RAM, single AXI4-Lite slave port)
-// ───────────────────────────────────────────────────────────────────────
+
 memory_top u_memory_top (
     .clk     (clk),
     .areset  (areset),
@@ -224,10 +165,9 @@ initial begin
     plaintext[0]   = 128'h000102030405060708090a0b0c0d0e0f;
     expected_ct[0] = 128'h50fe67cc996d32b6da0937e99bafec60;
 
-    plaintext[1]   = 128'h1112131415161718191a1b1c1d1e1f20;
-    expected_ct[1] = 128'hc02284f1df9c1e8401d2f105b9b5ab26;
+    plaintext[1]   = 128'h1112131415161718191a1b1c1d1ewrite_interfaceab26;
 
-    plaintext[2]   = 128'h22232425262728292a2b2c2d2e2f3031;
+    plaintext[2]   = 128'h22232425262728292a2b2c2d2e2fwrite_interface3031;
     expected_ct[2] = 128'heb97ffb0f5a23cc59da8652cc2057b7b;
 
     plaintext[3]   = 128'h333435363738393a3b3c3d3e3f404142;
