@@ -1,0 +1,50 @@
+=========================================================
+ STEP 1: Loading 6 plaintext blocks into memory_top
+=========================================================
+  Block 0  PT = 000102030405060708090a0b0c0d0e0f  written at addr 0x00000000..0x0000000c
+  Block 1  PT = 1112131415161718191a1b1c1d1e1f20  written at addr 0x00000010..0x0000001c
+  Block 2  PT = 22232425262728292a2b2c2d2e2f3031  written at addr 0x00000020..0x0000002c
+  Block 3  PT = 333435363738393a3b3c3d3e3f404142  written at addr 0x00000030..0x0000003c
+  Block 4  PT = 4445464748494a4b4c4d4e4f50515253  written at addr 0x00000040..0x0000004c
+  Block 5  PT = 55565758595a5b5c5d5e5f6061626364  written at addr 0x00000050..0x0000005c
+=========================================================
+ STEP 2: Configuring aes_ip (key / start / end addr)
+=========================================================
+  KEY        = 2b7e151628aed2a6abf7158809cf4f3c
+  START_ADDR = 0x00000000
+  END_ADDR   = 0x00000060
+=========================================================
+ STEP 3: Starting AES IP (CTRL.start = 1)
+=========================================================
+  AES IP DONE pulse observed at time 1805000
+=========================================================
+ STEP 4: Reading back ciphertext & comparing
+=========================================================
+  Block 0  PASS
+           Plaintext : 000102030405060708090a0b0c0d0e0f
+           Expected  : 50fe67cc996d32b6da0937e99bafec60
+           Got       : 50fe67cc996d32b6da0937e99bafec60
+  Block 1  PASS
+           Plaintext : 1112131415161718191a1b1c1d1e1f20
+           Expected  : c02284f1df9c1e8401d2f105b9b5ab26
+           Got       : c02284f1df9c1e8401d2f105b9b5ab26
+  Block 2  PASS
+           Plaintext : 22232425262728292a2b2c2d2e2f3031
+           Expected  : eb97ffb0f5a23cc59da8652cc2057b7b
+           Got       : eb97ffb0f5a23cc59da8652cc2057b7b
+  Block 3  PASS
+           Plaintext : 333435363738393a3b3c3d3e3f404142
+           Expected  : 3b658250bf2c33c926aba739d8e09c6f
+           Got       : 3b658250bf2c33c926aba739d8e09c6f
+  Block 4  PASS
+           Plaintext : 4445464748494a4b4c4d4e4f50515253
+           Expected  : 0605202d2ac4067a3513388043905a3c
+           Got       : 0605202d2ac4067a3513388043905a3c
+  Block 5  PASS
+           Plaintext : 55565758595a5b5c5d5e5f6061626364
+           Expected  : ad1abdb2b71b114749e89a9bd9f2d819
+           Got       : ad1abdb2b71b114749e89a9bd9f2d819
+=========================================================
+ RESULT: 6 / 6 blocks PASSED
+ *** ALL TEST VECTORS PASSED ***
+=========================================================
