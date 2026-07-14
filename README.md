@@ -30,26 +30,26 @@ A complete AES-128 encryption accelerator with AXI4-Lite interfaces, operating a
 
 ### Top-level controller
 ![Top-level controller ASMD chart](asmd_charts/AR_channel.png)
-<img src="asmd_charts/AR_channel.png" alt="Grayscale Source"
+<img src="asmd_charts/AR_channel.png">
 
 ### Read controller — AR FSM
-<img src="asmd_charts/R_channel.png" alt="Grayscale Source"
+<img src="asmd_charts/R_channel.png">
 
 
 ### Read controller — R FSM
-<img src="asmd_charts/AW_channel.png" alt="Grayscale Source"
+<img src="asmd_charts/AW_channel.png">
 
 
 ### Write controller
-<img src="asmd_charts/W_channel_1.png" alt="Grayscale Source"
+<img src="asmd_charts/W_channel_1.png">
 
 
 ### read_mem FIFO flow control
-<img src="asmd_charts/W_channel_2.png" alt="Grayscale Source"
+<img src="asmd_charts/W_channel_2.png">
 
 
 ### write_mem FIFO flow control
-<img src="asmd_charts/B_channel.png" alt="Grayscale Source"
+<img src="asmd_charts/B_channel.png">
 
 
 ---
