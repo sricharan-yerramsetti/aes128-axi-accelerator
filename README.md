@@ -87,7 +87,12 @@ Two independent 4-entry circular FIFOs (dual-pointer, 3-bit pointers for wrap de
 - `aw_idle` → `aw_run` on START; reads one `write_mem` entry (`rd_en`) and raises `AWVALID`+`WVALID` together.
 - In `aw_run`, waits for both address and data channels to complete (`aw_done && w_done`) before advancing; stalls the system if either channel isn't ready.
 - Returns to `aw_idle` once `write_mem` is empty and `done` asserts. Monitors `BRESP`; any non-`OKAY` sets `STATUS = ERROR`.
-
+  
+## Run
+```
+iverilog -g2012 -o aes_sim -f files.f
+vvp aes_sim
+```
 ## Performance
 
 - **Latency:** 10 cycles, `valid_in` (stage 0) → `valid_out` (stage 10).
